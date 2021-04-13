@@ -72,7 +72,7 @@ if (isset($_GET['q']))
 	<div class="container">
 	<h1>Species Cite<small>Find taxonomic names, where they were published, and by whom.</small></h1>
 
-	<p>A project by Rod Page.</p>
+	<p>A <a href="https://github.com/rdmpage/species-cite">project</a> by Rod Page.</p>
 	
 	<form action=".">
 	<div class="row">
