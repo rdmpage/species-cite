@@ -1,21 +1,10 @@
 # Species Cite
 
-
-## Related projects
-
-https://index.globalnames.org
-
-
-## LSIDs
-
-### Bugs
-
-https://lsid.herokuapp.com/urn:lsid:organismnames.com:name:3886289/jsonld `tcom:PublishedIn` is an array as we have two publications.
-
+Key idea is to have a text file of taxon name, identifier (LSID-like) and (optionally) a Wikidata QID for a bibliographic reference. Do a simple disk-based binary search of the file to find all occurrences of a taxon name, then display results. No need for a database, the file itself is the database.
 
 ## Make name database file
 
-For each database generate a TSV file of the form
+For each local taxonomic name database generate a TSV file of the form
 ```
 taxon name<tab>namespace:name id<tab>wikidata id
 ```
@@ -58,43 +47,18 @@ sort ipni-unsorted.tsv > ipni.tsv
 sort ion-unsorted.tsv > ion.tsv
 ``` 
 
+```
+sort worms-unsorted.tsv > worms.tsv
+``` 
+
 ### Merging
 
 ```
-sort -m if.tsv ipni.tsv ion.tsv > names.tsv
+sort -m if.tsv ipni.tsv ion.tsv worms.tsv > names.tsv
 ``` 
 
-## Wikidata
 
-### bugs
+## Related projects
 
-Order of authors broken, e.g. Q103823100 has correct order, but by time displayed authors are reversed:
+https://index.globalnames.org
 
-Puffinus bannermani
-
-TOM IREDALE, & GREGORY M. MATHEWS. (1915). On some Petrels from the North-East Pacific Ocean. Ibis, 57(3), 572–609. https://doi.org/10.1111/j.1474-919x.1915.tb08206.x
-
-## Unpaywall
-
-
-### Bugs
-
-Note that if BHL has content we don’t (might not?) have a PDF, e.g. http://localhost/~rpage/species-cite-o/?q=Calyptophilus DOI  https://doi.org/10.2307/4067266 we have 
-
-```
-"best_oa_location": {
-    "host_type": "repository", 
-    "oa_date": null, 
-    "version": "submittedVersion", 
-    "repository_institution": "Smithsonian Institute - Biodiversity Heritage Library", 
-    "evidence": "oa repository (via OAI-PMH doi match)", 
-    "url": "https://www.biodiversitylibrary.org/part/87693", 
-    "license": "pd", 
-    "updated": "2021-03-07T20:13:10.642363", 
-    "endpoint_id": "q6caunfjwsunh6wiqwpg", 
-    "url_for_landing_page": "https://www.biodiversitylibrary.org/part/87693", 
-    "pmh_id": "oai:biodiversitylibrary.org:part/87693", 
-    "url_for_pdf": null, 
-    "is_best": true
-  },
-```
