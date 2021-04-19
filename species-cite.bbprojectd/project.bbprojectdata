@@ -4,7 +4,8 @@
 <dict>
 	<key>HierarchyData</key>
 	<array>
-		<string>A3101B93-1A62-4B8E-A31F-4BF69A4B0C59</string>
+		<string>8DDAA179-44CD-4D3A-BF7F-2E76EEE883C3</string>
+		<string>D41B2FA4-AEC4-451B-B05C-959065374ABA</string>
 		<string>8E00BA39-3DE8-4CC2-A9C5-3F4AD7D13381</string>
 		<string>5F6565FE-3BEB-4F55-B069-CFC34643B0AD</string>
 		<string>5380C948-203D-4F0E-88CA-45649AEA4B15</string>
@@ -157,6 +158,54 @@
 			<key>UserOverrideItemName</key>
 			<true/>
 		</dict>
+		<key>8DDAA179-44CD-4D3A-BF7F-2E76EEE883C3</key>
+		<dict>
+			<key>ItemData</key>
+			<dict>
+				<key>BookmarkData</key>
+				<data>
+				Ym9va+gCAAAAAAQQMAAAAHjvQyMzrpA8Z83z3huKPdd+
+				IQMs7Je4jgxCt+YnsuFN5AEAAAQAAAADAwAAAAgAKAUA
+				AAABAQAAVXNlcnMAAAAFAAAAAQEAAHJwYWdlAAAABQAA
+				AAEBAABTaXRlcwAAAAwAAAABAQAAc3BlY2llcy1jaXRl
+				DgAAAAEBAAAuZ2l0YXR0cmlidXRlcwAAFAAAAAEGAAAQ
+				AAAAIAAAADAAAABAAAAAVAAAAAgAAAAEAwAAEGcCAAAA
+				AAAIAAAABAMAAIV0DQAAAAAACAAAAAQDAAAEVkwAAAAA
+				AAgAAAAEAwAAEjtrBgMAAAAIAAAABAMAAA6UawYDAAAA
+				FAAAAAEGAACIAAAAmAAAAKgAAAC4AAAAyAAAAAgAAAAA
+				BAAAQcMS7ilyqBAYAAAAAQIAAAEAAAAAAAAADwAAAAAA
+				AAAAAAAAAAAAAAgAAAAEAwAAAwAAAAAAAAAEAAAAAwMA
+				APUBAAAIAAAAAQkAAGZpbGU6Ly8vDAAAAAEBAABNYWNp
+				bnRvc2ggSEQIAAAABAMAAADgBANpAAAACAAAAAAEAABB
+				vt1dYgAAACQAAAABAQAAMjVFNDI4NkQtNzEyQy0zODk5
+				LUI0M0YtNUQzRjZBOEJEMTIxGAAAAAECAACBAAAAAQAA
+				AO8TAAABAAAAAAAAAAAAAAABAAAAAQEAAC8AAAAAAAAA
+				AQUAAMwAAAD+////AQAAAAAAAAAQAAAABBAAAGwAAAAA
+				AAAABRAAANgAAAAAAAAAEBAAAAQBAAAAAAAAQBAAAPQA
+				AAAAAAAAAiAAANABAAAAAAAABSAAAEABAAAAAAAAECAA
+				AFABAAAAAAAAESAAAIQBAAAAAAAAEiAAAGQBAAAAAAAA
+				EyAAAHQBAAAAAAAAICAAALABAAAAAAAAMCAAANwBAAAA
+				AAAAAcAAACQBAAAAAAAAEcAAACAAAAAAAAAAEsAAADQB
+				AAAAAAAAENAAAAQAAAAAAAAA
+				</data>
+				<key>FileURL</key>
+				<string>file:///Users/rpage/Sites/species-cite/.gitattributes</string>
+				<key>HasSecurityScope</key>
+				<true/>
+				<key>RelativePath</key>
+				<string>./.gitattributes</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<key>ItemName</key>
+			<string>.gitattributes</string>
+			<key>ItemType</key>
+			<string>FileReference</string>
+			<key>UserOverrideItemName</key>
+			<true/>
+		</dict>
 		<key>8E00BA39-3DE8-4CC2-A9C5-3F4AD7D13381</key>
 		<dict>
 			<key>ItemData</key>
@@ -207,7 +256,7 @@
 			<key>UserOverrideItemName</key>
 			<true/>
 		</dict>
-		<key>A3101B93-1A62-4B8E-A31F-4BF69A4B0C59</key>
+		<key>D41B2FA4-AEC4-451B-B05C-959065374ABA</key>
 		<dict>
 			<key>ItemData</key>
 			<dict>
