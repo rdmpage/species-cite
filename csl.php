@@ -104,6 +104,8 @@ function schema_to_csl($obj)
 
 	$csl = new stdclass;
 	
+	$author_index = -1;
+	
 	foreach ($obj as $k => $v)
 	{
 		switch ($k)
@@ -195,8 +197,24 @@ function schema_to_csl($obj)
 							}
 						}
 						
-						$csl->author[] = $author;
+						// Need to ensure authors are ordered correctly
+						// so use "position" if it is available
+						if (isset($value->position))
+						{
+							$author_index = ($value->position - 1);
+						}
+						else
+						{
+							$author_index++;
+						}						
+						$csl->author[$author_index] = $author;
 					}
+					
+					// ensure authors are ordered correctly by sorting on the array index
+					if (isset($csl->author))
+					{
+						ksort($csl->author, SORT_NUMERIC);
+					}					
 				}
 				else
 				{
@@ -422,6 +440,8 @@ function schema_to_csl($obj)
 				break;
 		}
 	}
+	
+
 	
 	return $csl;
 
