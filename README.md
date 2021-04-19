@@ -57,8 +57,23 @@ sort worms-unsorted.tsv > worms.tsv
 sort -m if.tsv ipni.tsv ion.tsv worms.tsv > names.tsv
 ``` 
 
+## Installing on Heroku
+
+To install on Heroku we need a way to get the large `names.tsv` file onto Heroku. The file is handled by Git Large File Storage (LFS) which Heroku doesn’t support by default. I used the following steps, based on [Deploying NLP Model on Heroku using Flask, NLTK, and Git-LFS](https://medium.com/analytics-vidhya/deploying-nlp-model-on-heroku-using-flask-nltk-and-git-lfs-eed7d1b22b11) by [pulkitrathi17](https://github.com/pulkitrathi17).
+
+You need to do 3 things to integrate Git-LFS with Heroku:
+
+1. Create a “Personal Access Token” for your Github account. Go to your Github profile ➜ Settings ➜ Developer Settings ➜ Personal access tokens ➜ Generate new token. Save this token somewhere safely. Note that you don’t need to specify any “scopes”, just create the token.
+
+2. Add a Heroku buildpack for Git-LFS: You can add the required buildback using either Heroku CLI or Heroku dashboard. I used the dashboard, so go to the Settings tab for your app and add `https://github.com/raxod502/heroku-buildpack-git-lfs` as a build pack. Note that adding this buildpack meant that when I first deployed the app it didn’t start at all. Using `heroku logs --tail --app species-cite` I got a `error code=H14 desc="No web processes running”`. The fix was to add the PHP buildpack as well. Normally I don’t have to do this as Heroku “knows” that it is PHP because of the `composer.json` file. But having the LFS buildpack seems to break this.
+
+3. Add config variable to your Heroku app. This step also can be done by either Heroku CLI or Heroku dashboard. The key is **HEROKU_BUILDPACK_GIT_LFS_REPO** and the value is the URL for your Github remote repo from which to download Git LFS assets. See here for details on the syntax. The URL should be like this:
+`https://<token_generated_in_first_step>@github.com/<user_name>/ <remote_repo_name>.git`, hence for this repository it is `https://<token_generated_in_first_step>@github.com/rdmpage/species-cite.git`
+
+As noted in (2) if you use the LFS build pack you need to explicitly tell Heroku that you need PHP.
+
 
 ## Related projects
 
-https://index.globalnames.org
+[Global Names Index](https://index.globalnames.org)
 
