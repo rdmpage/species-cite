@@ -4,3 +4,4 @@ cache/*
 !cache/README.md
 
 vendor/
+test.php
