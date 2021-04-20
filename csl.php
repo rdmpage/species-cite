@@ -57,7 +57,7 @@ function get_property_value($key, $propertyID)
 }
 
 //----------------------------------------------------------------------------------------
-// Literals may be strings, objects (e.g., a []@language, @value] pair), or an array.
+// Literals may be strings, objects (e.g., a @language, @value] pair), or an array.
 // Handle this and return a string
 function get_literal($key, $language='en')
 {
@@ -96,7 +96,16 @@ function get_literal($key, $language='en')
 }
 
 //----------------------------------------------------------------------------------------
-// Take a JSON-LD object for a bibliographic record and convert it to CSL
+// Given a string with multiple values and a delimiter, split it
+function pick_one_string($str, $delimiter = "/")
+{
+	$parts = preg_split('/\s*\/\s*/', $str);
+	
+	return $parts[0];
+}
+
+//----------------------------------------------------------------------------------------
+// Take a framed JSON-LD object for a bibliographic record and convert it to CSL
 function schema_to_csl($obj)
 {
 
@@ -157,10 +166,31 @@ function schema_to_csl($obj)
 						{
 							// In the CSL schema but seemingly problematic for citeproc PHP
 							$author->literal = get_literal($value->name);
+							
 
 							if (!isset($value->familyName))
 							{
-								$parts = preg_split('/,\s+/', get_literal($value->name));
+								// We need to handle author names where there has been a clumsy attempt
+								// (mostly by me) to include multiple language strings
+							
+								// 大橋広好(Hiroyoshi Ohashi)
+								// 韦毅刚/WEI Yi-Gang
+								if (preg_match('/^(.*)\s*[\/|\(]([^\)]+)/', $author->literal, $m))
+								{
+									// print_r($m);
+									
+									if (preg_match('/\p{Han}+/u', $m[1]))
+									{
+										$author->literal = $m[2];									
+									}
+									if (preg_match('/\p{Han}+/u', $m[2]))
+									{
+										$author->literal = $m[1];									
+									}
+									
+								}							
+							
+								$parts = preg_split('/,\s+/', get_literal($author->literal));
 								
 								if (count($parts) == 2)
 								{
@@ -169,7 +199,7 @@ function schema_to_csl($obj)
 								}
 								else
 								{
-									$parts = preg_split('/\s+/', get_literal($value->name));
+									$parts = preg_split('/\s+/', get_literal($author->literal));
 									
 									if (count($parts) > 1)
 									{
@@ -315,6 +345,12 @@ function schema_to_csl($obj)
 						}
 						
 					}
+				}
+				
+				// Clean up
+				if (isset($csl->{'container-title'}))
+				{
+					$csl->{'container-title'} = pick_one_string($csl->{'container-title'}, "/");
 				}
 				break;				
 				
