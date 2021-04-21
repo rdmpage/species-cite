@@ -456,6 +456,30 @@ function get_work_jsonld_framed($qid)
 
 	$g = new \EasyRdf\Graph();
 	$g->parse($triples);
+	
+	// Get simple JSON-LD
+	$options = array();
+	$format = \EasyRdf\Format::getFormat('jsonld');
+	$data = $g->serialise($format, $options);
+	
+	$doc = json_decode($data);
+	
+	// determine type to use for framing
+	$uri = 'http://www.wikidata.org/entity/' . $qid;
+	
+	
+
+	$n = count($doc);
+	$wikidata_types = array();
+	$i = 0;
+	while ($i < $n && count($wikidata_types) == 0)
+	{
+		if ($doc[$i]->{'@id'} == $uri)
+		{
+			$wikidata_types = $doc[$i]->{'@type'};
+		}
+		$i++;
+	}	
 
 	// Output
 	$context = new stdclass;
@@ -500,7 +524,7 @@ function get_work_jsonld_framed($qid)
 	// Frame document
 	$frame = (object)array(
 		'@context' => $context,
-		'@type' => 'http://www.wikidata.org/entity/Q13442814'
+		'@type' => $wikidata_types[0]
 	);	
 	
 	$options = array();
@@ -512,7 +536,53 @@ function get_work_jsonld_framed($qid)
 	$format = \EasyRdf\Format::getFormat('jsonld');
 	$data = $g->serialise($format, $options);
 	
-	return $data;
+	$jsonld = json_decode($data);
+	
+	// map types to schema
+	$schema_types = array();
+	
+	foreach ($wikidata_types as $type)
+	{
+		switch ($type)
+		{
+			// article
+		  case 'http://www.wikidata.org/entity/Q1348305': // erratum
+		  case 'http://www.wikidata.org/entity/Q13442814': // scholarly article
+		  case 'http://www.wikidata.org/entity/Q18918145': // academic journal article
+		  case 'http://www.wikidata.org/entity/Q191067': // article
+				$schema_types[] = 'ScholarlyArticle';
+				break;
+			
+			// book
+		  case 'http://www.wikidata.org/entity/Q47461344': // written work
+		  case 'http://www.wikidata.org/entity/Q571': // book
+		  case 'http://www.wikidata.org/entity/Q3331189': // version, edition, or translation
+				$schema_types[] = 'Book';
+				break;
+			
+			// book chapter
+		  case 'http://www.wikidata.org/entity/Q1980247':
+			$schema_types[] = 'Chapter';
+			break;
+			
+			// obituary
+		  case 'http://www.wikidata.org/entity/Q309481':
+			// eat this
+			break;			
+		
+		  default:
+		  	$schema_types[] = 'CreativeWork';
+		  	break;
+		  
+		}
+	}
+	
+	$jsonld->{'@type'} = $schema_types[0];
+	
+	
+	//print_r($wikidata_types);
+	
+	return json_encode($jsonld);
 
 }
 
