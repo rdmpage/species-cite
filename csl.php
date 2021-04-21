@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(E_ALL);
+
 // Convert JSON-LD to CSL
 
 //----------------------------------------------------------------------------------------
@@ -91,7 +93,7 @@ function get_literal($key, $language='en')
 			}
 		}
 	}
-	
+		
 	return $literal;
 }
 
@@ -119,21 +121,25 @@ function schema_to_csl($obj)
 	{
 		switch ($k)
 		{		
+			case '@id':
+				$csl->WIKIDATA = str_replace('http://www.wikidata.org/entity/', '', $v);
+				break;
+		
 			case '@type':
 				switch ($v)
-				{
+				{				
 					case 'Book':
 						$csl->type = 'book';
 						break;
 
 					case 'Chapter':
 						$csl->type = 'chapter';
-						break;
+						break;						
 
 					case 'ScholarlyArticle':
 						$csl->type = 'article-journal';
 						break;
-						
+												
 					default:
 						$csl->type = 'article-journal';
 						break;
@@ -236,7 +242,20 @@ function schema_to_csl($obj)
 						else
 						{
 							$author_index++;
-						}						
+						}
+						
+						// ORCID?
+						if (isset($value->sameAs))
+						{
+							foreach ($value->sameAs as $url)
+							{
+								if (preg_match('/orcid.org/', $url))
+								{
+									$author->ORCID = $url;
+								}
+							}
+						}					
+												
 						$csl->author[$author_index] = $author;
 					}
 					
