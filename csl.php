@@ -489,7 +489,23 @@ function schema_to_csl($obj)
 				}
 				break;
 				
-			
+			case 'encoding':
+				if (is_array($v))
+				{
+					foreach ($v as $encoding)
+					{
+						$link = new stdclass;
+						$link->URL = $encoding->contentUrl;
+						$link->{'content-type'} = $encoding->fileFormat;
+						
+						if (!isset($csl->link))
+						{
+							$csl->link = array();
+						}
+						$csl->link[] = $link;
+					}				
+				}
+				break;				
 			
 			default:
 				break;
