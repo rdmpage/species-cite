@@ -21,6 +21,11 @@ function get_lsid_triples($lsid)
 		case 'marinespecies.org':
 			$url = 'https://lsid-two.herokuapp.com/' . $lsid . '/ntriples';
 			break;
+
+		case 'ubio.org':
+			$url = 'https://lsid-two.herokuapp.com/' . $lsid . '/ntriples';
+			//$url = 'http://localhost/~rpage/lsid-cache-two/' . $lsid . '/ntriples';
+			break;
 	
 		default:
 			$url = 'https://lsid.herokuapp.com/' . $lsid . '/ntriples';
@@ -104,7 +109,7 @@ function search ($filename, $query)
 		
 		
 		// do we have the target string?
-		if (preg_match_all('/\n(?<string>' . $target . ')\t(?<id>\w+:\d+(-\d+)?)\t(?<wikidata>Q\d+)?/', $search_text, $m))
+		if (preg_match_all('/\n(?<string>' . $target . ')\t(?<id>\w+:\d+(-\d+)?)\t(?<higher>[^\t]+)?\t(?<wikidata>Q\d+)?\t(?<bhl>\d+)?\t(?<fragment>\d+)?/', $search_text, $m))
 		{
 			// we have one or more matches
 			$n = count($m[0]);
@@ -115,10 +120,26 @@ function search ($filename, $query)
 				$hit->text = $m['string'][$i];
 				$hit->id = $m['id'][$i];
 				
+				if ($m['higher'][$i] != '')
+				{
+					$hit->higher = $m['higher'][$i];
+				}				
+				
 				if ($m['wikidata'][$i] != '')
 				{
 					$hit->wikidata = $m['wikidata'][$i];
 				}
+				
+				if ($m['bhl'][$i] != '')
+				{
+					$hit->bhl = $m['bhl'][$i];
+				}
+
+				if ($m['fragment'][$i] != '')
+				{
+					$hit->fragment = $m['fragment'][$i];
+				}
+				
 				
 				$result->hits[] = $hit;
 			}
@@ -197,6 +218,10 @@ function build_search_graph($query)
 {
 	// find name and LSID
 	$filename = 'names.tsv';
+	
+	// test example
+	$filename = 'test.tsv';
+	
 	$obj = search($filename, $query);
 	
 	// print_r($obj);
@@ -231,6 +256,10 @@ function build_search_graph($query)
 
 				case 'ipni':
 					$id = 'urn:lsid:ipni.org:names:' . $m['id'];
+					break;
+					
+				case 'nz':
+					$id = 'urn:lsid:ubio.org:nz:' . $m['id'];
 					break;
 
 				case 'worms':
@@ -267,6 +296,47 @@ function build_search_graph($query)
 
 			$to_resolve[] = $hit->wikidata;
 		}
+		
+		if (isset($hit->bhl))
+		{
+			// Use isBasedOnUrl as a temporary hack until I figure out annotations
+			$item->add('schema:isBasedOnUrl', 'https://www.biodiversitylibrary.org/page/' . $hit->bhl );		
+		}
+		
+		if (isset($hit->higher))
+		{
+			// Treat the higher level taxon as the parent just so we don't clash with anything in the LSID
+			// We just want a single taxon higher up the tree
+			$item->add('schema:parentTaxon', $hit->higher );		
+		}
+		
+		if (isset($hit->fragment))
+		{
+			// Do we have a fragment selector such as the page within a PDF?
+			/*
+			{
+			  "@context": "http://www.w3.org/ns/anno.jsonld",
+			  "id": "http://example.org/anno20",
+			  "type": "Annotation",
+			  "body": {
+				"source": "http://example.org/video1",
+				"purpose": "describing",
+				"selector": {
+				  "type": "FragmentSelector",
+				  "conformsTo": "http://www.w3.org/TR/media-frags/",
+				  "value": "t=30,60"
+				}
+			  },
+			  "target": "http://example.org/image1"
+			}
+			*/
+			
+			// This needs to reall be part of an annotation on the PDF, but for now keep things simple
+			$item->add('schema:position', $hit->fragment );	
+		
+		}
+		
+		
 	}
 	
 	// Serialise the graph as triples, this makes it easier for us to append
@@ -306,6 +376,8 @@ function build_search_graph($query)
 		
 		}
 	}
+	
+	// echo $triples . "\n";	
 		
 	// Convert triples back into a graph
 	$g = new \EasyRdf\Graph();
@@ -337,8 +409,7 @@ function serialise_search_graph($g)
 	$context->dcterms = 'http://purl.org/dc/terms/';	
 	$context->owl = 'http://www.w3.org/2002/07/owl#';
 	
-	
-	
+	$context->wd = 'http://www.wikidata.org/entity/';
 	
 	// feed	
 	$dataFeedElement = new stdclass;
@@ -383,6 +454,10 @@ function serialise_search_graph($g)
 	
 	$context->{'sameAs'} = $sameas;
 	
+	$x = new stdclass;
+	$x->{'@reverse'} = "http://www.w3.org/ns/oa#hasBody";
+	$context->{'children'} = $x;
+	
 	
 	// Frame document
 	$frame = (object)array(
@@ -415,8 +490,11 @@ function do_search($q)
 	
 	$obj = serialise_search_graph($g);
 	
-
+	// print_r($obj);
 	
+	// echo json_encode($obj, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+	// Make a simple object for us to consume for the web app
 	if (isset($obj->dataFeedElement))
 	{
 		
@@ -459,6 +537,10 @@ function do_search($q)
 					case 'dwc:namePublishedIn': // WoRMS
 						$key = 'publishedIn';
 						$name->{$key} = $v;
+						break;
+						
+					case 'tn:authorship':
+						$name->authorship = $v;
 						break;
 					
 					default:
@@ -521,11 +603,52 @@ function do_search($q)
 						$a = new stdclass;
 						
 						$a->name = get_literal($author->name);
+					
+						if (preg_match('/http:\/\/www.wikidata.org\/entity\/(?<id>Q\d+)$/', $author->{'@id'}, $m))
+						{
+							$a->wikidata = $m['id'];
+						}
+						
+						
+						if (isset($author->sameAs))
+						{
+							foreach ($author->sameAs as $sameAs)
+							{
+								if (preg_match('/researchgate/', $sameAs))
+								{
+									$a->researchgate = str_replace('https://www.researchgate.net/profile/', '', $sameAs);
+								}
+								if (preg_match('/orcid/', $sameAs))
+								{
+									$a->orcid = str_replace('https://orcid.org/', '', $sameAs);
+								}
+							}
+						}
+						
 						
 						$name->people[] = $a;					
 					}					
 				}
 			}
+			
+			// BHL		
+			// Use isBasedOnUrl as a temporary hack
+			if (isset($item->isBasedOnUrl))
+			{
+				$name->bhl = str_replace('https://www.biodiversitylibrary.org/page/', '', $item->isBasedOnUrl);
+			}
+			
+			if (isset($item->parentTaxon))
+			{
+				$name->parentTaxon = $item->{'parentTaxon'};
+			}
+
+			// fragment selector
+			if (isset($item->position))
+			{
+				$name->fragment_selector = $item->{'position'};
+			}
+			
 			
 			$result[] = $name;
 
@@ -539,20 +662,21 @@ function do_search($q)
 }
 
 
-if (0)
+if (1)
 {
 	$q = 'Mitrula brevispora';
 	
 	$q= 'Elaeagnus xichouensis';
 	
 	$q = 'Kalidos dautzenbergianus';
+	
+	$q = 'Henckelia wijesundarae';
+	
+	$q = 'Adenophyllum glandulosum';
 
 	$result = do_search($q);
 
-	print_r($result);
+	//print_r($result);
 }
 
 ?>
-
-
-
