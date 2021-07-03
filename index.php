@@ -85,9 +85,29 @@ if (isset($_GET['q']))
 			$('#' + element_id).html(html);
 	
 		}
+		</script>	
 		
+		<script>
+		// Display BHL
+		function display_bhl(element_id, PageID) {
+			$('#' + element_id).html("");
+			
+			var height = 500;
 
+			// Add BHL page image
+			var img = document.createElement("img");
+			img.setAttribute("src", "https://aipbvczbup.cloudimg.io/s/height/1000/https://www.biodiversitylibrary.org/pagethumb/" + PageID + ",1000,1000" );
+			img.style.width = height + "px";
+			img.style.border = "1px solid rgb(192,192,192)";
+	
+			var div = document.getElementById(element_id);
+			div.appendChild(img);				
+
+		
+	
+		}
 		</script>			
+				
 		
 	</head>
 	<body>
@@ -97,7 +117,7 @@ if (isset($_GET['q']))
 			<span class="logo col-sm-3 col-md">Species Cite</span>
 		</header>
 		<div class="row">
-			<div class="col-sm-12 col-md-4">
+			<div class="col-sm-12 col-md-4" style="background:rgb(192,192,192);">
 				
 				<form action=".">
 				<div class="row">
@@ -130,7 +150,35 @@ if (isset($_GET['q']))
 	<div class="col-sm-12">
 		<div class="card fluid">';
 		
-			echo '<h3 class="doc section">' . $result->nameComplete . '</h3>';
+			echo '<h3 class="doc section">';
+			if (isset($result->nameComplete))
+			{
+				if (isset($result->parentTaxon))
+				{
+					$prefix = substr($result->parentTaxon, 0, 1);
+					
+					$img_url = 'http://localhost/~rpage/phylopic-taxa/images/' . $prefix . '/' . $result->parentTaxon . '.png';
+				
+					//echo '[' . $result->parentTaxon . ']';
+					echo '<img style="float:left;padding:2px;margin:4px;object-fit:contain;display:block;width:3em;height:3em;border:1px solid rgb(192,192,192);border-radius:8px;"  src="' . $img_url . '">';
+				}
+			
+				// echo '<img style="float:left;width:48px;" src="images/Cecidomyiidae.png">';
+			
+			
+				echo $result->nameComplete;
+				if (isset($result->authorship))
+				{
+					echo ' ' . $result->authorship;
+				}
+				
+			}
+			else
+			{
+				echo '<span>Missing name (missing LSID?)</span>';
+			}
+			
+			echo '</h3>';
 			
 			$lsid_resolver = 'https://lsid.herokuapp.com';
 			$parts = explode(':', $result->id);
@@ -140,6 +188,12 @@ if (isset($_GET['q']))
 				case 'marinespecies.org':
 					$lsid_resolver = 'https://lsid-two.herokuapp.com';
 					break;
+					
+				case 'ubio.org':
+					$lsid_resolver = 'https://lsid-two.herokuapp.com';
+					//$lsid_resolver = 'http://localhost/~rpage/lsid-cache-two';
+					break;
+					
 			
 				default:
 					$lsid_resolver = 'https://lsid.herokuapp.com';
@@ -167,6 +221,14 @@ if (isset($_GET['q']))
 				
 				echo '</p>';
 			}
+			
+			if (isset($result->bhl))
+			{
+				echo '<p class="doc section">';
+				echo '<button onclick="display_bhl(\'viewer\', ' . $result->bhl . ')">BHL</button>';
+				echo '</p>';
+			}
+			
 
 			
 			if (isset($result->publication))
@@ -199,17 +261,26 @@ if (isset($_GET['q']))
 				// View
 				echo '<p class="doc section">';
 				
+				// get fragment information if we have it
+				$page = 1;
+				
+				if (isset($result->fragment_selector))
+				{
+					$page = $result->fragment_selector;
+				}				
+				
 				// Do we already know that we have a PDF? If so, make a button
 				if (isset($result->publication->pdf))
 				{
-					// echo '<a href="' . $result->publication->pdf[0] . '">PDF</a>';					
-					echo '<button tertiary onclick="onclick=display_pdf(\'viewer\', \'' . $result->publication->pdf[0] . '\')">View</button>';
+					// echo '<a href="' . $result->publication->pdf[0] . '">PDF</a>';	
+					
+					echo '<button tertiary onclick="onclick=display_pdf(\'viewer\', \'' . $result->publication->pdf[0] . '\',\'' . $page . '\')">View</button>';
 				}
 				else
 				{
 					if (isset($result->publication->doi))
 					{
-						echo '<button disabled class="unpayall" id="unpaywall_' . $counter . '" data="' . $result->publication->doi . '">View</button>';
+						echo '<button disabled class="unpayall" id="unpaywall_' . $counter . '" data-doi="' . $result->publication->doi . '" data-page="' . $page . '">View</button>';
 					}
 				}
 				echo '</p>';
@@ -218,7 +289,61 @@ if (isset($_GET['q']))
 		
 			if (isset($result->people))
 			{
+				echo '<p class="doc section">';
+					foreach ($result->people as $person)
+					{
+						$ids = array();
+						
+						if (isset($person->id) && preg_match('/wd:Q/', $person->id))
+						{
+							$ids['wikidata'] = str_replace('wd:', '', $person->id);
+						}
+
+						if (isset($person->researchgate))
+						{
+							$ids['researchgate'] = $person->researchgate;
+						}
+
+						if (isset($person->orcid))
+						{
+							$ids['orcid'] = $person->orcid;
+						}
+						
+						$img_url = '';
+						
+						if (isset($ids['researchgate']))
+						{
+							$prefix = substr($ids['researchgate'], 0, 1);
+							$img_url = 'http://localhost/~rpage/researchgate-harvester/images/' . $prefix . '/' . str_replace('_', '-', $ids['researchgate']) . '.jpg';
+						}
+						
+						echo '<p>';
+						
+						if (count($ids) > 0)
+						{
+							
+							if ($img_url != '')
+							{
+								echo '<img style="float:left;padding:2px;margin:4px;object-fit:contain;display:block;width:3em;height:3em;border:1px solid rgb(192,192,192);border-radius:8px;" src="' . $img_url  . '">';
+							}
+						
+						
+							echo '<mark class="tag">';
+						}
+					
+						echo $person->name;
+						
+						
+						if (count($ids) > 0)
+						{
+							echo '</mark>';
+						}
+						
+						
+						echo '</p>';
+					}
 			
+				echo '</p>';
 			}
 		
 		echo '</div>
@@ -237,7 +362,8 @@ if (isset($_GET['q']))
 				$( "button" ).each(function() {
    					
   					var id = $(this).attr("id");
-  					var doi = $(this).attr("data");
+  					var doi = $(this).attr("data-doi");
+  					var page = $(this).attr("data-page");
   					
   					var url = "https://api.oadoi.org/v2/" + encodeURIComponent(doi) 
   						+ "?email=unpaywall@impactstory.org" ;
@@ -248,7 +374,7 @@ if (isset($_GET['q']))
 							if (data.is_oa) {
 								$("#" + id).removeAttr("disabled");
 								$("#" + id).html("View (via Unpaywall)");
-								$("#" + id).attr("onclick", "display_pdf(\'viewer\', \'" + data.oa_locations[0].url_for_pdf + "\')");
+								$("#" + id).attr("onclick", "display_pdf(\'viewer\', \'" + data.oa_locations[0].url_for_pdf + "\', \'" + page + "\')");
 							}
 						}
 					);
