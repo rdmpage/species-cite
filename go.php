@@ -95,14 +95,34 @@ function search ($filename, $query)
 	while (!$done)
 	{
 		$result->count++;
+		
 	
 		$pivot = floor(($start + $end) / 2);
+		
+		if (0)
+		{
+			echo '<pre>';
+			echo "start=$start end=$end pivot=$pivot\n";
+			echo '</pre>';
+		}
+		
 	
 		fseek($fp, $pivot);
 		$data = fread($fp, $CHUNK_SIZE);
+		
+		// echo $data;
 	
 		// ensure chunk starts and ends cleanly on a row of data
 		preg_match('/^(?<prefix>[^\n]*)\n(?<middle>.*)\n(?<suffix>[^\n]*)$/s', $data, $m);
+		
+		
+		if (0)
+		{
+			echo '<pre>';
+			print_r($m);
+			echo '</pre>';
+		}
+		
 
 		// after trimming off start and end we search on this fragment of the file
 		$search_text = "\n" . $m['middle'];
@@ -220,7 +240,7 @@ function build_search_graph($query)
 	$filename = 'names.tsv';
 	
 	// test example
-	$filename = 'test.tsv';
+	//$filename = 'test.tsv';
 	
 	$obj = search($filename, $query);
 	
@@ -331,7 +351,7 @@ function build_search_graph($query)
 			}
 			*/
 			
-			// This needs to reall be part of an annotation on the PDF, but for now keep things simple
+			// This needs to really be part of an annotation on the PDF, but for now keep things simple
 			$item->add('schema:position', $hit->fragment );	
 		
 		}
@@ -411,6 +431,15 @@ function serialise_search_graph($g)
 	
 	$context->wd = 'http://www.wikidata.org/entity/';
 	
+	
+	// nomenclaturalCode
+	$nomenclaturalCode = new stdclass;
+	$nomenclaturalCode->{'@id'} = "tn:nomenclaturalCode";
+	$nomenclaturalCode->{'@type'} = "@id";
+	
+	$context->{'tn:nomenclaturalCode'} = $nomenclaturalCode;	
+	
+	
 	// feed	
 	$dataFeedElement = new stdclass;
 	$dataFeedElement->{'@id'} = "dataFeedElement";
@@ -445,6 +474,14 @@ function serialise_search_graph($g)
 	$contentUrl->{'@type'} = "@id";
 	
 	$context->{'contentUrl'} = $contentUrl;	
+	
+	// thumbnailUrl
+	$thumbnailUrl = new stdclass;
+	$thumbnailUrl->{'@id'} = "thumbnailUrl";
+	$thumbnailUrl->{'@type'} = "@id";
+	
+	$context->{'thumbnailUrl'} = $thumbnailUrl;	
+	
 	
 	// sameAs
 	$sameas = new stdclass;
@@ -542,6 +579,10 @@ function do_search($q)
 					case 'tn:authorship':
 						$name->authorship = $v;
 						break;
+						
+					case 'tn:nomenclaturalCode':
+						$name->code = $v;
+						break;
 					
 					default:
 						break;
@@ -604,11 +645,17 @@ function do_search($q)
 						
 						$a->name = get_literal($author->name);
 					
+						/*
 						if (preg_match('/http:\/\/www.wikidata.org\/entity\/(?<id>Q\d+)$/', $author->{'@id'}, $m))
 						{
 							$a->wikidata = $m['id'];
 						}
+						*/
 						
+						if (preg_match('/wd:(?<id>Q\d+)$/', $author->{'@id'}, $m))
+						{
+							$a->wikidata = $m['id'];
+						}						
 						
 						if (isset($author->sameAs))
 						{
@@ -625,11 +672,21 @@ function do_search($q)
 							}
 						}
 						
+						if (isset($author->thumbnailUrl))
+						{
+							$a->thumbnailUrl = $author->thumbnailUrl;
+						}
 						
 						$name->people[] = $a;					
 					}					
 				}
 			}
+			
+			if (count($name->people) == 0)
+			{
+				unset($name->people);
+			}
+			
 			
 			// BHL		
 			// Use isBasedOnUrl as a temporary hack

@@ -2,6 +2,26 @@
 
 cache/*
 !cache/README.md
+!cache/bhl/README.md
+!cache/wikidata/README.md
+
 
 vendor/
 test.php
+if.tsv
+ion-unsorted.tsv
+ion.tsv
+ipni.tsv
+if-unsorted.tsv
+ipni-unsorted.tsv
+nz-unsorted.tsv
+nz.tsv
+worms-unsorted.tsv
+worms.tsv
+
+adodb5/
+junk/
+thumbnails/
+
+coverage.php
+c*.html

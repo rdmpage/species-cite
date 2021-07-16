@@ -10,6 +10,7 @@ use Seboettg\CiteProc\CiteProc;
 
 require_once(dirname(__FILE__) . '/wikidata.php');
 require_once(dirname(__FILE__) . '/csl.php');
+require_once(dirname(__FILE__) . '/go.php');
 
 //----------------------------------------------------------------------------------------
 function default_display()
@@ -87,7 +88,29 @@ function display_one ($id, $format= '', $callback = '')
 		
 	echo $output;
 
-}	
+}
+
+//----------------------------------------------------------------------------------------
+function display_search($q, $callback = '')
+{
+	$g = build_search_graph($q);
+	
+	$obj = serialise_search_graph($g);
+
+	header("Content-type: text/plain");
+	
+	if ($callback != '')
+	{
+		echo $callback . '(';
+	}
+	
+	echo json_encode($obj, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+	
+	if ($callback != '')
+	{
+		echo ')';
+	}
+}
 
 //----------------------------------------------------------------------------------------
 function main()
@@ -130,7 +153,19 @@ function main()
 			}
 			
 		}
-	}	
+	}
+	
+	if (!$handled)
+	{
+		if (isset($_GET['q']))
+		{	
+			$q = $_GET['q'];
+			display_search($q, $callback);
+			
+			$handled = true;
+		}
+			
+	}		
 	
 	if (!$handled)
 	{

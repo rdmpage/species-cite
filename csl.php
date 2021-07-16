@@ -54,6 +54,12 @@ function get_property_value($key, $propertyID)
 		}
 	
 	}
+	
+	// we may have badness if we have more than one value (e.g., multiple DOis)
+	if (is_array($value))
+	{
+		$value = $value[0];
+	}
 
 	return $value;
 }
