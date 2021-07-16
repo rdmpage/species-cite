@@ -327,7 +327,17 @@ function copy_citation(id) {
 			
 			if (isset($result->code))
 			{
-				switch ($result->code)
+				if (is_object($result->code))
+				{
+					$code = $result->code->{'@id'};
+				}
+				else
+				{
+					$code = $result->code;
+				}
+			
+			
+				switch ($code)
 				{
 					case 'tn:ICZN':
 						$class = "animalia";
@@ -445,7 +455,7 @@ function copy_citation(id) {
 				echo '<div>';
 				
 				echo '<a class="external bhl" href="http://www.biodiversity.org/page/' . $result->bhl . '" target="_new">' . $result->bhl . '</a>';
-				echo '<button onclick="display_bhl(\'viewer\', ' . $result->bhl . ')">View BH page</button>';
+				echo '<button onclick="display_bhl(\'viewer\', ' . $result->bhl . ')">View BHL page</button>';
 				
 				echo '</div>';
 			}
