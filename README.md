@@ -3,6 +3,15 @@
 
 ## Examples
 
+### Nice
+
+Philautus jayarami
+Garcinia nuntasaenii
+
+### Other
+
+
+
 Henckelia wijesundarae
 
 - Tectaria phanomensis
@@ -15,6 +24,8 @@ Henckelia wijesundarae
 ### Missing LSIDs
 
 Tibellus vosseleri 5519101
+Henckelia wijesundarae 77157639-1
+
 
 
 
@@ -107,6 +118,10 @@ sort worms-unsorted.tsv > worms.tsv
 
 ```
 sort -m if.tsv ipni.tsv ion.tsv worms.tsv > names.tsv
+``` 
+
+```
+sort -m if.tsv ipni.tsv ion.tsv nz.tsv > names.tsv
 ``` 
 
 ## Installing on Heroku

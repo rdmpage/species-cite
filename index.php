@@ -62,6 +62,12 @@ a:hover {
   font-size:0.8em;
 }
 
+.bhl:before {
+  content: url('images/bhl_16x16.png');
+  vertical-align: middle;
+  padding-right: 3px;
+}
+
 .doi:before {
   content: url('images/doi_16x16.png');
   vertical-align: middle;
@@ -437,7 +443,10 @@ function copy_citation(id) {
 			if (isset($result->bhl))
 			{
 				echo '<div>';
-				echo '<button onclick="display_bhl(\'viewer\', ' . $result->bhl . ')">BHL</button>';
+				
+				echo '<a class="external bhl" href="http://www.biodiversity.org/page/' . $result->bhl . '" target="_new">' . $result->bhl . '</a>';
+				echo '<button onclick="display_bhl(\'viewer\', ' . $result->bhl . ')">View BH page</button>';
+				
 				echo '</div>';
 			}
 			
@@ -556,7 +565,7 @@ function copy_citation(id) {
 					
 						echo '<img style="float:left;margin-right:4px;object-fit:cover;display:block;width:2em;height:2em;border:1px solid rgb(192,192,192);" src="' . $img_url  . '">';
 					
-						echo $person->name;
+						echo '<span style="font-size:0.8em;">' . $person->name . '</span>';
 												
 						if (count($ids) > 0)
 						{
