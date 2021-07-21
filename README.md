@@ -8,6 +8,10 @@
 Philautus jayarami
 Garcinia nuntasaenii
 
+### Homonym
+
+Wenyingia
+
 ### Other
 
 
@@ -111,14 +115,15 @@ sort ion-unsorted.tsv > ion.tsv
 ``` 
 
 ```
+sort nz-unsorted.tsv > nz.tsv
+``` 
+
+```
 sort worms-unsorted.tsv > worms.tsv
 ``` 
 
 ### Merging
 
-```
-sort -m if.tsv ipni.tsv ion.tsv worms.tsv > names.tsv
-``` 
 
 ```
 sort -m if.tsv ipni.tsv ion.tsv nz.tsv > names.tsv
@@ -165,6 +170,18 @@ I’d though of using `@reverse` to include BHL pages, e.g.:
 
 This would connect the IPNI name id as the `oa:body` of the annotation, and then I could link the BHL page URL using `oa:source` (and use `oa:selector` to give details on the string location on the page). Unfortunately I can’t figure out how to generate framed JSON-LD that includes `@reverse`. However, tools to parse JSON-LD seem to extract the correct triples. So may have to construct JSON-LD manually… :(
 
+### ResearchGate “Wall”
+
+```
+SELECT distinct ?researchgate WHERE {
+  ?work wdt:P50 ?author.
+  ?author wdt:P2038 ?researchgate .
+  
+  #taxonomist? 
+  ?article schema:about ?author .
+  FILTER(regex(str(?article), "species.wikimedia.org"))
+ } 
+```
 
 ## Related projects
 

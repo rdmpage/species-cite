@@ -259,7 +259,61 @@ a:hover {
 			var div = document.getElementById(element_id);
 			div.appendChild(img);				
 		}
-		</script>		
+		</script>	
+		
+		<script>
+		// Display preview
+		function display_preview(element_id, uri) {
+		
+			var html = '<div class="dark" style="padding:3em;display:block;overflow:auto;">[Fetching preview]</div>';
+		
+			document.getElementById(element_id).innerHTML = html;
+
+			$.getJSON('./preview.php?url=' + uri + '&callback=?', function(data) {
+			if (data) {
+				
+				
+				var content = "";
+				
+				if (data.image) {
+					content += '<img style="height:128;padding-right:1em;float:left;" src="' + data.image + '">';
+				}
+				
+				if (data.url) {
+					content += '<a href="' + data.url + '" target="_new">';
+				}				
+							
+				if (data.title) {
+					content += '<div><b>' + data.title + '</b></div>';
+				}
+
+				if (data.url) {
+					content += '</a>';
+				}
+					
+				if (data.description) {
+					content += '<div style="font-size:0.8em;">' + data.description + '</div>';
+				}
+				
+				if (content == "") {
+					content = "[no preview available]";
+				}
+				
+				var html = '<div class="dark" style="padding:3em;display:block;overflow:auto;">';
+				html += content;
+				html += '</div>';
+			
+			
+				//document.getElementById(element_id).innerHTML = JSON.stringify(data, null, 2);
+				document.getElementById(element_id).innerHTML = html;
+			}
+			else
+			{
+				document.getElementById(element_id).innerHTML = "[no preview available]";
+			}
+		 });	
+		}
+		</script>				
 		
 		<script>
 
@@ -493,6 +547,8 @@ function copy_citation(id) {
 				
 				echo '</div>';
 				
+				$preview_url = '';
+				
 				if (isset($result->publication->doi))
 				{
 					echo '<div>';
@@ -500,10 +556,14 @@ function copy_citation(id) {
 					echo '<a class="external doi" href="https://doi.org/' .$result->publication->doi . '" target="_new">' . $result->publication->doi . '</a><span class="icon-link"></span>';
 										
 					echo '</div>';
+					
+					$preview_url = "https://doi.org/" . $result->publication->doi;
 				}
 				
 				// View
 				echo '<div>';
+				
+				
 				
 				// get fragment information if we have it
 				$page = 1;
@@ -523,8 +583,16 @@ function copy_citation(id) {
 					if (isset($result->publication->doi))
 					{
 						echo '<button disabled class="unpayall" id="unpaywall_' . $counter . '" data-doi="' . $result->publication->doi . '" data-page="' . $page . '">Unpaywall</button>';
+						
+						
 					}
 				}
+				
+				if ($preview_url != '')
+				{
+					echo '<button onclick="display_preview(\'viewer\', \'' . urlencode($preview_url) . '\')">Preview article</button>';						
+				}
+				
 				echo '</div>';
 				
 			}
@@ -623,9 +691,22 @@ function copy_citation(id) {
 						function(data){
 							console.log(data);
 							if (data.is_oa) {
-								$("#" + id).removeAttr("disabled");
-								$("#" + id).html("View (via Unpaywall)");
-								$("#" + id).attr("onclick", "display_pdf(\'viewer\', \'" + data.oa_locations[0].url_for_pdf + "\', \'" + page + "\')");
+								
+								// PDF
+								if (data.oa_locations[0].url_for_pdf) {
+									$("#" + id).removeAttr("disabled");
+									$("#" + id).html("View (via Unpaywall)");
+									$("#" + id).attr("onclick", "display_pdf(\'viewer\', \'" + data.oa_locations[0].url_for_pdf + "\', \'" + page + "\')");
+								} else {								
+								
+									if (data.oa_locations[0].url_for_landing_page) {
+									
+										// Could be BHL, do we display this...?
+									
+									}
+								
+								
+								}
 							}
 						}
 					);
@@ -646,7 +727,19 @@ function copy_citation(id) {
 			
 		<!-- middle column -->
 		<div id="middle_column" class="middle_column">
-			<div id="viewer"></div>
+			<div id="viewer">
+			
+			<?php
+			
+			if ($q == '')
+			{
+				echo '<iframe id="pdf" src="wall.html" width="100%" height="auto"  frameBorder="0"></iframe>';
+			}
+				
+			?>
+			
+			
+			</div>
 		</div>
 
 		<!-- right column -->
@@ -654,14 +747,60 @@ function copy_citation(id) {
 			
 			<!-- think what to do here -->
 			<div class="dark" style="font-size:0.8em;">
-				Credits:
+				<h1>Species cite</h1>
+				
+				<p>Species Cite takes it's name from the idea that 
+				taxonomists and others who study biodiversity (such as those shown here)
+				often don't get sufficient recognition for the work they do. An often suggested idea
+				is that if you mention a species name in a publication you should cite the author of
+				that name (or a recent taxonomic revision of that species). But finding these citations
+				can be hard - Species Cite aims to make this easier.</p>
+				
+				<p>
+					To use, simply put a scientific name (animal, plant, or fungus) into the search box and go. If the name is found you
+					will get a list of names and database identifiers. If you are lucky there will be a link to
+					a PDF or BHL page where you can see the description of the name. If available, information
+					about the authors of that work is also shown.					
+				</p>
+				
+				<h5>Examples</h5>
+				<ul>
+				<li><a href="?q=Philautus jayarami">Philautus jayarami</a> (PDF displays at page)</li>
+				<li><a href="?q=Garcinia nuntasaenii">Garcinia nuntasaenii</a> (see the authors)</li>
+				<li><a href="?q=Wenyingia">Wenyingia</a> (a homonym)</li>
+				<li><a href="?q=Aenigma">Aenigma</a> (a homonym)</li>
+				<li><a href="?q=Braunsapis">Braunsapis</a> (bee in JSTOR)</li>
+				<li><a href="?q=Niitakacris arishanensis">Niitakacris arishanensis</a> (CNKI DOI)</li>				
+				<li><a href="?q=Schismatoglottis crypta">Schismatoglottis crypta</a> (see the authors)</li>
+				<li><a href="?q=Myrmeleon uptoni">Myrmeleon uptoni</a> (journal cover preview)</li>
+				<li><a href="?q=Tetracoelactis">Tetracoelactis</a> (journal cover preview)</li>
+				<li><a href="?q=Desetangsia drabae">Desetangsia drabae</a> (JSTOR preview)</li>
+				<li><a href="?q=Straminella varia ">Desetangsia drabae</a> (large preview, phylogeny)</li>
+
+
+
+
+				<!--
+				<li><a href="?q=Aenigma">Aenigma</a> (a homonym)</li>
+				<li></li>
+				-->
+				
+				</ul>
+				
+				
+				
+				
+			
+			
+				<h5>Credits</h5>
 				
 				<ul>
 				<li>Taxonomic names from <a href="http://www.organismnames.com">ION</a>, <a href="https://www.ipni.org">IPNI</a>, <a href="http://www.indexfungorum.org">Index Fungorum</a>, and <a href="http://www.ubio.org/NZ/">Nomenclator Zoologicus</a>.</li>
 				<li>LSIDs from caches <a href="https://lsid.herokuapp.com">one</a> and <a href="https://lsid-two.herokuapp.com">two</a>.</li>
 				<li>Mapping between names and publications from <a href="http://bionames.org">BioNames</a> and unpublished projects.</li>
 				<li>Bibliographic data from <a href="https://www.wikidata.org/">Wikidata</a>.</li>
-				<li>PDFs from <a href="https://archive.org/details/taxonomyarchive">Internet Archive</a> and the <a href="https://web.archive.org">Wayback Machine</a>.</li>
+				<li>PDFs from <a href="https://archive.org/details/taxonomyarchive">Internet Archive</a>,
+				the <a href="https://web.archive.org">Wayback Machine</a>, and <a href="https://unpaywall.org">Unpaywall</a>.</li>
 				<li>BHL pages from the <a href="https://www.biodiversitylibrary.org">Biodiversity Heritage Library</a>.</li>
 				<li>Taxon images from <a href="http://phylopic.org">Phylopic</a>.</li>
 				<li>People images from <a href="https://www.wikidata.org/">Wikidata</a> and <a href="https://www.researchgate.net">ResearchGate</a>.</li>
