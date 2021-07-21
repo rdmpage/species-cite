@@ -590,7 +590,7 @@ function copy_citation(id) {
 				
 				if ($preview_url != '')
 				{
-					echo '<button onclick="display_preview(\'viewer\', \'' . urlencode($preview_url) . '\')">Preview article</button>';						
+					// echo '<button onclick="display_preview(\'viewer\', \'' . urlencode($preview_url) . '\')">Preview article</button>';						
 				}
 				
 				echo '</div>';
@@ -772,10 +772,10 @@ function copy_citation(id) {
 				<li><a href="?q=Braunsapis">Braunsapis</a> (bee in JSTOR)</li>
 				<li><a href="?q=Niitakacris arishanensis">Niitakacris arishanensis</a> (CNKI DOI)</li>				
 				<li><a href="?q=Schismatoglottis crypta">Schismatoglottis crypta</a> (see the authors)</li>
-				<li><a href="?q=Myrmeleon uptoni">Myrmeleon uptoni</a> (journal cover preview)</li>
-				<li><a href="?q=Tetracoelactis">Tetracoelactis</a> (journal cover preview)</li>
-				<li><a href="?q=Desetangsia drabae">Desetangsia drabae</a> (JSTOR preview)</li>
-				<li><a href="?q=Straminella varia ">Straminella varia</a> (large preview, phylogeny)</li>
+				<li><a href="?q=Myrmeleon uptoni">Myrmeleon uptoni</a> </li>
+				<li><a href="?q=Tetracoelactis">Tetracoelactis</a> </li>
+				<li><a href="?q=Desetangsia drabae">Desetangsia drabae</a> (JSTOR)</li>
+				<li><a href="?q=Straminella varia ">Straminella varia</a> (phylogeny)</li>
 
 
 
