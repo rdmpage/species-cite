@@ -333,7 +333,7 @@ function copy_citation(id) {
 	<body onload="$(window).resize();">
 	
 	<div class="header">
-		Species Cite
+		<a style ="color:white" href="./">Species Cite</a>
 	</div>
 
 	<!-- three columns -->
@@ -357,6 +357,11 @@ function copy_citation(id) {
 		// do stuff here...
 		
 		$results = do_search(trim($q));
+		
+		
+		echo '<div class="dark" style="margin:8px;color:">';
+		echo '<a href="./api.php?q=' . urlencode($q) . '">API call</a>';
+		echo '</div>';
 		
 		if (0)
 		{
@@ -767,16 +772,25 @@ function copy_citation(id) {
 				<ul>
 				<li><a href="?q=Philautus jayarami">Philautus jayarami</a> (PDF displays at page)</li>
 				<li><a href="?q=Garcinia nuntasaenii">Garcinia nuntasaenii</a> (see the authors)</li>
-				<li><a href="?q=Wenyingia">Wenyingia</a> (a homonym)</li>
+				
+				<!-- massive error -->
+				<li><a href="?q=Wenyingia">Wenyingia</a> (a homonym)</li>				
 				<li><a href="?q=Aenigma">Aenigma</a> (a homonym)</li>
 				<li><a href="?q=Braunsapis">Braunsapis</a> (bee in JSTOR)</li>
 				<li><a href="?q=Niitakacris arishanensis">Niitakacris arishanensis</a> (CNKI DOI)</li>				
 				<li><a href="?q=Schismatoglottis crypta">Schismatoglottis crypta</a> (see the authors)</li>
+				<!--
 				<li><a href="?q=Myrmeleon uptoni">Myrmeleon uptoni</a> </li>
 				<li><a href="?q=Tetracoelactis">Tetracoelactis</a> </li>
+				-->
 				<li><a href="?q=Desetangsia drabae">Desetangsia drabae</a> (JSTOR)</li>
-				<li><a href="?q=Straminella varia ">Straminella varia</a> (phylogeny)</li>
-
+				<li><a href="?q=Straminella varia">Straminella varia</a> (phylogeny)</li>
+				<li><a href="?q=Malaxella tetracantha">Malaxella tetracantha</a> (PDF via Unpaywall)</li>
+				
+				<!-- BHL -->
+				<li><a href="?q=Begonia curtii">Begonia curtii</a> (BHL page)</li>
+				<li><a href="?q=Calcaratolobelia tenella">Calcaratolobelia tenella</a> (BHL page)</li>
+			
 
 
 

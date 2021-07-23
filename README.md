@@ -1,45 +1,20 @@
 # Species Cite
 
 
-## Examples
-
-### Nice
-
-Philautus jayarami
-Garcinia nuntasaenii
-
-### Homonym
-
-Wenyingia
-
-### Other
-
-
-
-Henckelia wijesundarae
-
-- Tectaria phanomensis
-- Garcinia nuntasaenii
-
-- Acanthogonatus minimus
-- Acantholycosa azarkinae
-- Adrastis lashbrooki, Aenigma, Afrarchaea grimaldii *unpaywall error*
-
-### Missing LSIDs
-
-Tibellus vosseleri 5519101
-Henckelia wijesundarae 77157639-1
-
-
-
-
-### Badness
-
-- Acrostichum filare: multiple DOIs and PDFs, problem with SPARQL returning multiple values for single field :( http://localhost/~rpage/species-cite/api.php?q=Acrostichum+filare
-
-- Tisaniba (Loeblica) loebli not found
-
 ## Introduction
+
+“Species Cite” takes as its inspiration the suggestion that citing original taxonomic descriptions (and subsequent revisions) would increase citation metrics for taxonomists, and give them the credit they deserve. Regardless of the merits of this idea, it is difficult to implement because we don’t have an easy way of discovering which paper we should cite. Species Cite tackles this by combining millions of taxonomic name records linked to LSIDs with bibliographic data from Wikidata to make it easier to cite the sources of taxonomic names. Where possible it provides access to PDFs for articles using Internet Archive or Unpaywall. These can be displayed in an embedded PDF viewer. Given the original motivation of surfacing the work of taxonomists, Species Cite also attempts to display information about the authors of a taxonomic paper, such as ORCID and/or Wikidata identifiers, and an avatar for the author. This enables us to get closer to the kind of social interface found in citizen science projects like iNaturalist where participants are people with personalities, not simply strings of text. Furthermore by identifying people and associating them with taxa it could help us discover who are the experts on particular taxonomic groups, and also enable those people to easily establish that they are, in fact, experts.
+
+
+## Demo script
+
+- Home page with “wall” of taxonomists
+- Examples of citations
+- Examples of PDFs
+- Examples of BHL
+- Examples of people’s avatars
+
+## Methods
 
 Key idea is to have a text file of taxon name, identifier (LSID-like) and (optionally) a Wikidata QID for a bibliographic reference. Do a simple disk-based binary search of the file to find all occurrences of a taxon name, then display results. No need for a database, the file itself is the database.
 
@@ -183,7 +158,18 @@ SELECT distinct ?researchgate WHERE {
  } 
 ```
 
+Then call [rdmpage/researchgate-harvester](https://github.com/rdmpage/researchgate-harvester) to retrieve image (if it exists).
+
 ## Related projects
 
 [Global Names Index](https://index.globalnames.org)
+
+
+## Issues
+
+### Badness
+
+- Acrostichum filare: multiple DOIs and PDFs, problem with SPARQL returning multiple values for single field :( http://localhost/~rpage/species-cite/api.php?q=Acrostichum+filare
+
+- Tisaniba (Loeblica) loebli not found
 
