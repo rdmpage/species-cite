@@ -801,8 +801,34 @@ function copy_citation(id) {
 				
 				</ul>
 				
+				<!--
+				
+				-->
+				
+				<h5>Names linked to publications in Wikidata</h5>
+				<table>
+				<tbody class="dark" style="font-size:0.8em">
+				<tr><td>IF</td><td><progress max="499082" value="69186"></progress></td></tr>						
+				<tr><td>ION</td><td><progress max="1700811" value="395482"></progress></td></tr>
+				<tr><td>IPNI</td><td><progress max="1667909" value="331938"></progress></td></tr>
+				<tr><td>NZ</td><td><progress max="343145" value="5655"></progress></td></tr>
+				</tbody>
+				</table>
+				
+				<!--
 				
 				
+				-->
+
+				<h5>Names linked to publications with identifiers</h5>
+				<table>
+				<tbody class="dark" style="font-size:0.8em">
+				<tr><td>IF</td><td><progress max="499082" value="88455"></progress></td></tr>						
+				<tr><td>ION</td><td><progress max="1700811" value="722562"></progress></td></tr>
+				<tr><td>IPNI</td><td><progress max="1667909" value="462104"></progress></td></tr>
+				<tr><td>NZ</td><td><progress max="343145" value="40519"></progress></td></tr>
+				</tbody>
+				</table>
 				
 			
 			
