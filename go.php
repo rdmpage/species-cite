@@ -613,6 +613,11 @@ function do_search($q)
 				{
 					$name->publication->doi = $citeproc->DOI;
 				}				
+
+				if (isset($citeproc->JSTOR))
+				{
+					$name->publication->jstor = $citeproc->JSTOR;
+				}				
 				
 				$name->publication->citeproc = json_encode($citeproc , JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);				
 				

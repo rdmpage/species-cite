@@ -92,6 +92,12 @@ a:hover {
   padding-right: 3px;
 }
 
+.jstor:before {
+  content: url('images/jstor_16x16.png');
+  vertical-align: middle;
+  padding-right: 3px;
+}
+
 .ubio:before {
   content: url('images/ubio_16x16.png');
   vertical-align: middle;
@@ -565,6 +571,18 @@ function copy_citation(id) {
 					$preview_url = "https://doi.org/" . $result->publication->doi;
 				}
 				
+				if (isset($result->publication->jstor))
+				{
+					echo '<div>';
+					
+					echo '<a class="external jstor" href="https://www.jstor.org/stable/' .$result->publication->jstor . '" target="_new">' . $result->publication->jstor . '</a><span class="icon-link"></span>';
+										
+					echo '</div>';
+					
+					//$preview_url = "https://doi.org/" . $result->publication->doi;
+				}
+				
+				
 				// View
 				echo '<div>';
 				
@@ -768,6 +786,12 @@ function copy_citation(id) {
 					about the authors of that work is also shown.					
 				</p>
 				
+				<p>
+					For more details see <a href="https://iphylo.blogspot.com/2021/07/species-cite-linking-scientific-names.html">
+					Species Cite: linking scientific names to publications and taxonomists</a>. Source code and data set of
+					links between names and publications is on <a href="https://github.com/rdmpage/species-cite">GitHub</a>.
+				</p>
+				
 				<h5>Examples</h5>
 				<ul>
 				<li><a href="?q=Philautus jayarami">Philautus jayarami</a> (PDF displays at page)</li>
@@ -802,6 +826,73 @@ function copy_citation(id) {
 				</ul>
 				
 				<!--
+				
+
+
+				-- ION
+				SELECT COUNT(Id) FROM names WHERE publication IS NOT NULL;
+
+				SELECT COUNT(Id) FROM names WHERE wikidata IS NOT NULL;
+
+				SELECT COUNT(Id) FROM names WHERE 
+				(doi IS NOT NULL) 
+				OR (handle IS NOT NULL) 
+				OR (jstor IS NOT NULL) 
+				OR (biostor IS NOT NULL) 
+				OR (cinii IS NOT NULL)
+				OR (url IS NOT NULL)
+				OR (pdf IS NOT NULL);
+
+				-- IPNI
+
+				SELECT COUNT(Id) FROM names WHERE Publication IS NOT NULL;
+
+				SELECT COUNT(Id) FROM names WHERE wikidata IS NOT NULL;
+
+				SELECT COUNT(Id) FROM names WHERE 
+				(doi IS NOT NULL) 
+				OR (handle IS NOT NULL) 
+				OR (jstor IS NOT NULL) 
+				OR (biostor IS NOT NULL) 
+				OR (bhl IS NOT NULL)
+				OR (cinii IS NOT NULL)
+				OR (url IS NOT NULL)
+				OR (pdf IS NOT NULL);
+
+
+				-- 331938
+
+				SELECT COUNT(Id) FROM names WHERE doi IS NOT NULL;
+
+				-- 220060
+
+				SELECT COUNT(Id) FROM names WHERE jstor IS NOT NULL;
+
+				-- 129923
+
+				-- IF
+				SELECT COUNT(Id) FROM names_indexfungorum;
+
+				SELECT COUNT(Id) FROM names_indexfungorum WHERE wikidata IS NOT NULL;
+
+				SELECT COUNT(Id) FROM names_indexfungorum WHERE 
+				(doi IS NOT NULL) 
+				OR (handle IS NOT NULL) 
+				OR (jstor IS NOT NULL) 
+				OR (biostor IS NOT NULL) 
+				OR (bhl IS NOT NULL)
+				OR (cinii IS NOT NULL)
+				OR (url IS NOT NULL)
+				OR (pdf IS NOT NULL);
+
+
+				-- NZ 
+				SELECT COUNT(Id) FROM nz;
+
+				SELECT COUNT(Id) FROM nz_id WHERE namespace='wikidata';
+
+				SELECT COUNT(Id) FROM nz_id WHERE namespace NOT IN ('ion');
+				SELECT COUNT(Id) FROM nz_bhl;				
 				
 				-->
 				

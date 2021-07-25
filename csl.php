@@ -435,6 +435,12 @@ function schema_to_csl($obj)
 					{
 						$csl->ARCHIVE = $archive;
 					}
+					
+					$jstor = get_property_value($v, 'jstor');
+					if ($jstor != '')
+					{
+						$csl->JSTOR = strtolower($jstor);
+					}					
 
 					$pmid = get_property_value($v, 'pmid');
 					if ($pmid != '')
