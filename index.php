@@ -519,7 +519,7 @@ function copy_citation(id) {
 			{
 				echo '<div>';
 				
-				echo '<a class="external bhl" href="http://www.biodiversity.org/page/' . $result->bhl . '" target="_new">' . $result->bhl . '</a>';
+				echo '<a class="external bhl" href="http://www.biodiversitylibrary.org/page/' . $result->bhl . '" target="_new">' . $result->bhl . '</a>';
 				echo '<button onclick="display_bhl(\'viewer\', ' . $result->bhl . ')">View BHL page</button>';
 				
 				echo '</div>';
