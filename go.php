@@ -368,6 +368,8 @@ function build_search_graph($query)
 	$format = \EasyRdf\Format::getFormat('ntriples');
 	$triples = $graph->serialise($format);
 	
+	// echo $triples . "\n\n";
+	
 	if (1)
 	{
 		// OK, get additional RDF for names, publications, etc. as triples
@@ -379,6 +381,11 @@ function build_search_graph($query)
 			if (preg_match('/^urn:lsid/', $uri))
 			{
 				$lsid_triples = get_lsid_triples($uri);
+				
+				// ensure bnodes are unique withint combined document
+				$lsid_triples = preg_replace('/_:genid(\d+)/', '_:genidlsid$1', $lsid_triples);
+				
+				// echo $lsid_triples . "\n\n";
 				
 				/*
 				echo '<pre>';
@@ -394,6 +401,11 @@ function build_search_graph($query)
 			if (preg_match('/^Q/', $uri))
 			{			
 				$wikidata_triples = get_work($uri);
+				
+				// ensure bnodes are unique withint combined document
+				$wikidata_triples = preg_replace('/_:genid(\d+)/', '_:genidwd$1', $wikidata_triples);
+								
+				// echo $wikidata_triples . "\n\n";
 				
 				$triples .= $wikidata_triples;
 			}
@@ -470,12 +482,12 @@ function serialise_search_graph($g)
 	
 	$context->{'encoding'} = $encoding;
 	
-	
+	/*
 	// contentUrl
+
 	$contentUrl = new stdclass;
 	$contentUrl->{'@id'} = "contentUrl";
-	$contentUrl->{'@type'} = "@id";
-	
+	$contentUrl->{'@type'} = "@id";	
 	$context->{'contentUrl'} = $contentUrl;	
 	
 	// thumbnailUrl
@@ -484,6 +496,7 @@ function serialise_search_graph($g)
 	$thumbnailUrl->{'@type'} = "@id";
 	
 	$context->{'thumbnailUrl'} = $thumbnailUrl;	
+	*/
 	
 	
 	// sameAs
@@ -529,6 +542,8 @@ function serialise_search_graph($g)
 		$serialiser = new $serialiserClass();
 
 		$triples = $serialiser->serialise($g, 'ntriples');
+		
+		// echo '<pre>' . htmlentities($triples) . '</pre>';
 	
 		$nquads = new NQuads();
 		// And parse them again to a JSON-LD document
@@ -773,6 +788,9 @@ if (0)
 	$q = 'Henckelia wijesundarae';
 	
 	$q = 'Adenophyllum glandulosum';
+	
+	$q = 'Aenigma';
+	$q = 'Mitrula brevispora';
 
 	$result = do_search($q);
 
