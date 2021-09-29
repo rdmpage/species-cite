@@ -10,6 +10,60 @@ require_once(dirname(__FILE__) . '/csl.php');
 use ML\JsonLD\JsonLD;
 use ML\JsonLD\NQuads;
 
+//----------------------------------------------------------------------------------------
+// From easyrdf/lib/parser/ntriples
+function unescapeString($str)
+    {
+        if (strpos($str, '\\') === false) {
+            return $str;
+        }
+
+        $mappings = array(
+            't' => chr(0x09),
+            'b' => chr(0x08),
+            'n' => chr(0x0A),
+            'r' => chr(0x0D),
+            'f' => chr(0x0C),
+            '\"' => chr(0x22),
+            '\'' => chr(0x27)
+        );
+        foreach ($mappings as $in => $out) {
+            $str = preg_replace('/\x5c([' . $in . '])/', $out, $str);
+        }
+
+        if (stripos($str, '\u') === false) {
+            return $str;
+        }
+
+        while (preg_match('/\\\(U)([0-9A-F]{8})/', $str, $matches) ||
+               preg_match('/\\\(u)([0-9A-F]{4})/', $str, $matches)) {
+            $no = hexdec($matches[2]);
+            if ($no < 128) {                // 0x80
+                $char = chr($no);
+            } elseif ($no < 2048) {         // 0x800
+                $char = chr(($no >> 6) + 192) .
+                        chr(($no & 63) + 128);
+            } elseif ($no < 65536) {        // 0x10000
+                $char = chr(($no >> 12) + 224) .
+                        chr((($no >> 6) & 63) + 128) .
+                        chr(($no & 63) + 128);
+            } elseif ($no < 2097152) {      // 0x200000
+                $char = chr(($no >> 18) + 240) .
+                        chr((($no >> 12) & 63) + 128) .
+                        chr((($no >> 6) & 63) + 128) .
+                        chr(($no & 63) + 128);
+            } else {
+                # FIXME: throw an exception instead?
+                $char = '';
+            }
+            $str = str_replace('\\' . $matches[1] . $matches[2], $char, $str);
+        }
+        return $str;
+    }
+
+
+
+
 
 //----------------------------------------------------------------------------------------
 function get_lsid_triples($lsid)
@@ -542,6 +596,17 @@ function serialise_search_graph($g)
 		$serialiser = new $serialiserClass();
 
 		$triples = $serialiser->serialise($g, 'ntriples');
+		
+		// Remove JSON-style encoding
+		$told = explode("\n", $triples);
+		$tnew = array();
+
+		foreach ($told as $s)
+		{
+			$tnew[] = unescapeString($s);
+		}
+
+		$triples = join("\n", $tnew);		
 		
 		// echo '<pre>' . htmlentities($triples) . '</pre>';
 	
