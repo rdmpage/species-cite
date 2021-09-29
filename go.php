@@ -7,6 +7,10 @@ require_once('vendor/autoload.php');
 require_once(dirname(__FILE__) . '/wikidata.php');
 require_once(dirname(__FILE__) . '/csl.php');
 
+use ML\JsonLD\JsonLD;
+use ML\JsonLD\NQuads;
+
+
 //----------------------------------------------------------------------------------------
 function get_lsid_triples($lsid)
 {
@@ -449,8 +453,7 @@ function serialise_search_graph($g)
 	// publication
 	$author = new stdclass;
 	$author->{'@id'} = "author";
-	$author->{'@container'} = "@set"; 
-
+	$author->{'@container'} = "@list"; 
 	$context->{'author'} = $author;
 		
 	// ISSN is always an array
@@ -508,11 +511,32 @@ function serialise_search_graph($g)
 	$options['compact'] = true;
 	$options['frame']= $frame;	
 	
-	$format = \EasyRdf\Format::getFormat('jsonld');
-	$data = $g->serialise($format, $options);
+	if (0)
+	{
+		$format = \EasyRdf\Format::getFormat('jsonld');
+		$data = $g->serialise($format, $options);
 	
-	// convert to object
-	$obj = json_decode($data);
+		// convert to object
+		$obj = json_decode($data);
+	}
+	else
+	{	
+		// Use same libary as EasyRDF but access directly to output ordered list of authors
+	
+		$format = \EasyRdf\Format::getFormat('ntriples');
+
+		$serialiserClass  = $format->getSerialiserClass();
+		$serialiser = new $serialiserClass();
+
+		$triples = $serialiser->serialise($g, 'ntriples');
+	
+		$nquads = new NQuads();
+		// And parse them again to a JSON-LD document
+		$quads = $nquads->parse($triples);		
+		$doc = JsonLD::fromRdf($quads);
+	
+		$obj = JsonLD::frame($doc, $frame);
+	}
 
 	return $obj;
 }
@@ -525,17 +549,31 @@ function do_search($q)
 
 	$g = build_search_graph($q);
 	
+	//print_r($g);
+	
 	$obj = serialise_search_graph($g);
 	
-	// print_r($obj);
+	//print_r($obj);
 	
 	// echo json_encode($obj, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
 	// Make a simple object for us to consume for the web app
+	
+	$dataFeedElement = null;
+	
 	if (isset($obj->dataFeedElement))
 	{
+		$dataFeedElement = $obj->dataFeedElement;
+	}
+	if (isset($obj->{'@graph'}[0]->dataFeedElement))
+	{
+		$dataFeedElement = $obj->{'@graph'}[0]->dataFeedElement;
+	}
+	
+	if (isset($dataFeedElement))
+	{
 		
-		foreach ($obj->dataFeedElement as $item)
+		foreach ($dataFeedElement as $item)
 		{
 			$name = new stdclass;
 			
@@ -724,7 +762,7 @@ function do_search($q)
 }
 
 
-if (1)
+if (0)
 {
 	$q = 'Mitrula brevispora';
 	
@@ -738,7 +776,7 @@ if (1)
 
 	$result = do_search($q);
 
-	//print_r($result);
+	print_r($result);
 }
 
 ?>
